@@ -43,19 +43,30 @@ export const createJobStore = writable({
   services: [],
 });
 
-export const createArticleListStore = writable([
+export const createArticleListStore: Writable<
   {
-    title: "",
-    ai_keywords: "",
-    photos: [],
-    ai_photos: [],
-    html_article_content: "<p>Hello World ....</p>",
-    ai_article_content: "",
-    publish_date: "2022-01-01 10:00:00.123Z",
-    public: true,
-  },
-]);
-export const articleSelectecForEditing = writable({
+    title: string;
+    ai_keywords: string;
+    photos: string[];
+    ai_photos: string[];
+    html_article_content: string;
+    ai_article_content: string;
+    publish_date: string;
+    public: boolean;
+  }[]
+> = writable([]);
+export const articleSelectecForEditing:Writable<
+{
+  title: string;
+  ai_keywords: string;
+  photos: string[];
+  ai_photos: string[];
+  html_article_content: string;
+  ai_article_content: string;
+  publish_date: string;
+  public: boolean;
+}
+> = writable({
   title: "",
   ai_keywords: "",
   photos: [],

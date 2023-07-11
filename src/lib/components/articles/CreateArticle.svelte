@@ -8,6 +8,7 @@
   } from "$lib/stores";
   import { list } from "postcss";
   import { Spinner } from "flowbite-svelte";
+  import PreviewChunks from "./PreviewChunks.svelte";
 
   let apiKey = "q7h0i8r0h7ha598lyeh91pwubnpq34dseiz76p98qmzol7dc";
 
@@ -44,13 +45,15 @@
     height: 500,
     images_upload_handler: uploadFile,
     plugins: [
-      "a11ychecker",
-      "advlist",
-      "advcode",
-      "advtable",
+      // "a11ychecker",
+      // "advlist",
+      // "advcode",
+      // "advtable",
+      // "checklist",
+      // "export",
+      // "powerpaste",
+      // "formatpainter",
       "autolink",
-      "checklist",
-      "export",
       "lists",
       "link",
       "image",
@@ -59,9 +62,7 @@
       "anchor",
       "searchreplace",
       "visualblocks",
-      "powerpaste",
       "fullscreen",
-      "formatpainter",
       "insertdatetime",
       "media",
       "table",
@@ -103,32 +104,31 @@
         ai_photos: res?.data?.images,
         ai_article_content: res?.data?.answer,
       });
-      // createArticleListStore.update((list) => {
-      //   list = [...list, val];
-      //   return list;
-      // });
+      createArticleListStore.update((list) => {
+        list = [...list, $articleSelectecForEditing];
+        return list;
+      });
     } else {
       loading = false;
       error = res?.error;
     }
   }
-
-  function extractContent(s: string) {
-    var span = document.createElement("span");
-    span.innerHTML = s;
-    return span.textContent || span.innerText;
-  }
 </script>
 
+
+
+<PreviewChunks />
 <label for="title">Title:</label>
 <input
-  bind:value={$articleSelectecForEditing.ai_keywords}
+  bind:value={$articleSelectecForEditing.title}
   type="text"
   id="title"
   placeholder="Enter title"
   name="title"
   required
 />
+
+
 <div>
   <div class="relative">
     <div
@@ -175,53 +175,3 @@
   {conf}
   bind:value={$articleSelectecForEditing.html_article_content}
 />
-
-<style>
-  form {
-    font-family: Arial, Helvetica, sans-serif;
-  }
-  * {
-    box-sizing: border-box;
-  }
-
-  .form-inline {
-    display: flex;
-    flex-flow: row wrap;
-    align-items: center;
-  }
-
-  .form-inline label {
-    margin: 5px 10px 5px 0;
-  }
-
-  .form-inline input {
-    vertical-align: middle;
-    margin: 5px 10px 5px 0;
-    padding: 10px;
-    background-color: #fff;
-    border: 1px solid #ddd;
-  }
-
-  .form-inline button {
-    padding: 10px 20px;
-    background-color: dodgerblue;
-    border: 1px solid #ddd;
-    color: white;
-    cursor: pointer;
-  }
-
-  .form-inline button:hover {
-    background-color: royalblue;
-  }
-
-  @media (max-width: 800px) {
-    .form-inline input {
-      margin: 10px 0;
-    }
-
-    .form-inline {
-      flex-direction: column;
-      align-items: stretch;
-    }
-  }
-</style>

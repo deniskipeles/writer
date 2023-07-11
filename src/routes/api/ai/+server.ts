@@ -28,7 +28,17 @@ export async function POST({ request, fetch, url, locals: { company, user } }) {
       headers: {
         "content-type": "application/json",
       },
-    }).then((res) => res.json());
+    }).then(async (res) => {
+      let result = await res.json();
+      let images = result?.images;
+      let answer = replaceImagePlaceholders(result?.answer, images);
+      result = {
+        ...result,
+        images,
+        answer,
+      };
+      return result;
+    });
 
     return json({ success: true, data: response });
   } catch (error: any) {
@@ -42,15 +52,19 @@ function replaceImagePlaceholders(
   inputString: string,
   imageUrls: string[]
 ): string {
-  const placeholderRegex = /\[Image of \.\.\.\.\.\]/g;
-  let index = 0;
+  const placeholderRegex = /\[Image of ([^\]]+)\]/g;
 
-  const outputString = inputString.replace(placeholderRegex, () => {
-    if (index >= imageUrls.length) {
-      return "[Image of ......]";
-    }
-    return `<img src="${imageUrls[index++]}" alt="Image">`;
-  });
+  const outputString = inputString
+    .replace(placeholderRegex, (_, placeholder) => {
+      const imageUrl = imageUrls.shift() || "";
+      return `
+      <div class="bg-white rounded-lg shadow-lg p-4">
+        <img src="${imageUrl}" alt="${placeholder}" class="w-full h-auto rounded-lg">
+      </div>
+    `;
+    })
+    .replace(/\*{2}([^*]+)\*{2}/g, "<strong>$1</strong>")
+    .replace(/\*([^*]+)\*/g, "<em>$1</em>");
 
   return outputString;
 }
