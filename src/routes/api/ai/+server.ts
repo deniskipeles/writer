@@ -21,6 +21,7 @@ export async function POST({ request, fetch, url, locals: { company, user } }) {
       conversation_id: "c_1f04f704a788e6e4",
       site: url.origin,
     };
+    console.log(data)
 
     const response = await fetch("https://askq-five.vercel.app/api/ai", {
       method: "POST",
@@ -39,6 +40,8 @@ export async function POST({ request, fetch, url, locals: { company, user } }) {
       };
       return result;
     });
+
+    console.log(response)
 
     return json({ success: true, data: response });
   } catch (error: any) {

@@ -43,20 +43,8 @@ export const createJobStore = writable({
   services: [],
 });
 
-export const createArticleListStore: Writable<
-  {
-    title: string;
-    ai_keywords: string;
-    photos: string[];
-    ai_photos: string[];
-    html_article_content: string;
-    ai_article_content: string;
-    publish_date: string;
-    public: boolean;
-  }[]
-> = writable([]);
-export const articleSelectecForEditing:Writable<
-{
+export interface Article {
+  identity: string;
   title: string;
   ai_keywords: string;
   photos: string[];
@@ -66,7 +54,8 @@ export const articleSelectecForEditing:Writable<
   publish_date: string;
   public: boolean;
 }
-> = writable({
+const whole = {
+  identity: "combined",
   title: "",
   ai_keywords: "",
   photos: [],
@@ -75,7 +64,9 @@ export const articleSelectecForEditing:Writable<
   ai_article_content: "",
   publish_date: "2022-01-01 10:00:00.123Z",
   public: true,
-});
-export const articleSelectecForEditingPosition = writable(0);
+};
+
+export const createArticleListStore: Writable<Article[]> = writable([whole]);
+export const articleSelectedForEditingPosition = writable(0);
 
 export const searchCustomers: Writable<ListResult<Record>> = writable();

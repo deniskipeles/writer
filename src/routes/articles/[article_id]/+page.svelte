@@ -23,9 +23,8 @@
   {#if data?.error}
     <ErrorComp error={data?.error} />
   {/if}
-  {#if data?.article}
-    <!-- content here -->
-    {@html data?.article?.content}
-  {/if}
-  <CreateArticle />
+  <p class="font-bold">{data?.article?.title ?? "No Title"}</p>
+  <div>
+    {@html data?.article?.html_article_content}
+  </div>
 </div>

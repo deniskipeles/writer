@@ -3,12 +3,13 @@
   import Editor from "@tinymce/tinymce-svelte";
   import { goto } from "$app/navigation";
   import {
-    articleSelectecForEditing,
     createArticleListStore,
+    articleSelectedForEditingPosition,
   } from "$lib/stores";
-  import { list } from "postcss";
-  import { Spinner } from "flowbite-svelte";
+
+  import { Button, Helper, Input, Label, Spinner } from "flowbite-svelte";
   import PreviewChunks from "./PreviewChunks.svelte";
+  import ImagesList from "./ImagesList.svelte";
 
   let apiKey = "q7h0i8r0h7ha598lyeh91pwubnpq34dseiz76p98qmzol7dc";
 
@@ -86,8 +87,7 @@
     const response = await fetch("/api/ai", {
       method: "POST",
       body: JSON.stringify({
-        ...$articleSelectecForEditing,
-        q: `${$articleSelectecForEditing?.ai_keywords}`,
+        q: `${$createArticleListStore[$articleSelectedForEditingPosition].ai_keywords}`,
       }),
       headers: {
         "content-type": "application/json",
@@ -96,47 +96,108 @@
     const res = await response.json();
 
     if (res?.success) {
-      // console.log(res)
+      // console.log(res);
+      const dt = $createArticleListStore[$articleSelectedForEditingPosition];
       loading = false;
-      articleSelectecForEditing.set({
-        ...$articleSelectecForEditing,
+      const dtToPush = {
+        ...dt,
+        identity: "ai",
         html_article_content: `<p>${res?.data?.answer}</p>`,
         ai_photos: res?.data?.images,
         ai_article_content: res?.data?.answer,
-      });
+      };
+      // console.log(dtToPush);
       createArticleListStore.update((list) => {
-        list = [...list, $articleSelectecForEditing];
+        list = [...list, dtToPush];
         return list;
       });
+      let pos = $createArticleListStore.length - 1;
+      articleSelectedForEditingPosition.set(pos);
     } else {
       loading = false;
       error = res?.error;
     }
   }
+
+  let translating = false;
+  let errorTrans = null;
+  async function handleTranslate() {
+    translating = true;
+    errorTrans = null;
+
+    const response = await fetch("/api/translate", {
+      method: "POST",
+      body: JSON.stringify({
+        text: $createArticleListStore[$articleSelectedForEditingPosition]
+          .html_article_content,
+      }),
+      headers: {
+        "content-type": "application/json",
+      },
+    });
+    const res = await response.json();
+
+    if (res?.success) {
+      translating = false;
+      createArticleListStore.update((list) => {
+        list = list.map((obj, id) => {
+          if (id == $articleSelectedForEditingPosition) {
+            obj.html_article_content = res?.data?.text;
+          }
+          return obj;
+        });
+        return list;
+      });
+    } else {
+      translating = false;
+      errorTrans = res?.error;
+    }
+  }
+
+  function translate() {
+    if ($createArticleListStore.length > 1) {
+      handleTranslate();
+    }
+  }
 </script>
 
+<div class="flex flex-wrap items-center gap-2">
+  <PreviewChunks />
+  {#if translating}
+    <Button><Spinner />translating...</Button>
+  {:else}
+    <Button on:click={translate}>Translate</Button>
+  {/if}
+  <ImagesList/>
+</div>
 
+<Label class="block space-y-2">
+  <span>Title:</span>
+  <Input
+    bind:value={$createArticleListStore[$articleSelectedForEditingPosition]
+      .title}
+    label="Email"
+    id="email"
+    name="email"
+    required
+    placeholder="Title.."
+  />
+  <Helper class="text-sm"
+    >This the title of the article.</Helper
+  >
+</Label>
 
-<PreviewChunks />
-<label for="title">Title:</label>
-<input
-  bind:value={$articleSelectecForEditing.title}
-  type="text"
-  id="title"
-  placeholder="Enter title"
-  name="title"
-  required
-/>
-
-
-<div>
+<Label class="block space-y-2">
+  <span>Key Words:</span>
   <div class="relative">
     <div
       id="inputContainer"
       class="border w-full border-gray-300 rounded p-2 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
       contenteditable
       placeholder="Enter you question.."
-      bind:innerText={$articleSelectecForEditing.ai_keywords}
+      bind:innerText={$createArticleListStore[
+        $articleSelectedForEditingPosition
+      ].ai_keywords}
       style="min-height: 1rem; max-height: 10rem;"
     />
     {#if loading}
@@ -167,11 +228,15 @@
       </button>
     {/if}
   </div>
-</div>
+  <Helper class="text-sm"
+    >Start Entering Keywords And Send It AI To Generate The Article.</Helper
+  >
+</Label>
 
 <br />
 <Editor
   {apiKey}
   {conf}
-  bind:value={$articleSelectecForEditing.html_article_content}
+  bind:value={$createArticleListStore[$articleSelectedForEditingPosition]
+    .html_article_content}
 />

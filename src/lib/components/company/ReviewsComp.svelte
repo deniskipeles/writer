@@ -78,7 +78,7 @@
         return {
           title: obj?.name,
           date: getTimeAgo(obj?.created),
-          alt: "image alt here",
+          alt: "none",
           src: getReviewImageUrl(obj),
           text: obj?.comment,
         };
@@ -127,7 +127,7 @@
         ratings={calculateRatingPercentages($hostel_review_agg?.rating_counts)}
       >
         <span slot="rating">
-          <Rating total={5} rating={3.72} id="example-8">
+          <Rating total={5} rating={$hostel_review_agg.mean_rate} id="example-8">
             <p
               slot="text"
               class="text-sm font-medium text-gray-500 dark:text-gray-400 ml-2"

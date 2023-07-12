@@ -46,10 +46,10 @@
     {#each data?.articles?.items as item}
       <div class="mb-4">
         <h2 class="text-xl font-bold">{item?.title}</h2>
-        <p>Author: {item?.expand?.author?.name ?? item?.expand?.author?.email}</p>
+        <p>Author: {item?.expand?.author?.name ?? item?.expand?.author?.email ?? 'Anonymous'}</p>
         <p>Created On: {formatDateTime(item?.created)}</p>
 
-        <h3 class="text-lg font-bold mt-4">Photos:</h3>
+        <!-- <h3 class="text-lg font-bold mt-4">Photos:</h3> -->
         <Gallery
           class="grid relative xl:grid-cols-5 gap-6"
           items={getImagesURLs(item)}

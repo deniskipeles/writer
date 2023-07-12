@@ -9,10 +9,6 @@
       label: "Write Article",
       url: "/articles/create-article",
     },
-    {
-      label: "Reviews",
-      url: "/reviews",
-    },
   ];
 
   import {
