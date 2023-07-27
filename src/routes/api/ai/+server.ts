@@ -21,8 +21,10 @@ export async function POST({ request, fetch, url, locals: { company, user } }) {
       conversation_id: "c_1f04f704a788e6e4",
       site: url.origin,
     };
-    console.log(data)
+    // console.log(data)
 
+    // http://127.0.0.1:5000
+    // https://askq-five.vercel.app
     const response = await fetch("https://askq-five.vercel.app/api/ai", {
       method: "POST",
       body: JSON.stringify(data),
@@ -41,11 +43,11 @@ export async function POST({ request, fetch, url, locals: { company, user } }) {
       return result;
     });
 
-    console.log(response)
+    // console.log(response)
 
     return json({ success: true, data: response });
   } catch (error: any) {
-    // console.log(error)
+    console.log(error)
     error = serializeNonPOJOs(error);
     return json({ success: false, error });
   }
